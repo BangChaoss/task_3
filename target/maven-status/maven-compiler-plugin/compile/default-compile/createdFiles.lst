@@ -1,0 +1,9 @@
+com\weather\controller\WeatherController$DailyDisplay.class
+com\weather\dto\WeatherResponse$Daily.class
+com\weather\dto\WeatherResponse$Hourly.class
+com\weather\WeatherDashboardApplication.class
+com\weather\controller\WeatherController$HourlyDisplay.class
+com\weather\service\WeatherService.class
+com\weather\dto\WeatherResponse$Current.class
+com\weather\dto\WeatherResponse.class
+com\weather\controller\WeatherController.class

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Dashboard - Hanoi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --bg-color: #ffffff;
+            --text-main: #202124;
+            --text-sub: #5f6368;
+            --border-color: #dadce0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        header {
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .status {
+            color: var(--text-sub);
+            font-size: 14px;
+        }
+
+        .current-weather-section {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+
+        .main-icon {
+            font-size: 80px;
+            color: #3c4043;
+        }
+
+        .temp-display {
+            font-size: 96px;
+            font-weight: 400;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .unit {
+            font-size: 32px;
+            margin-top: 20px;
+            margin-left: 10px;
+            font-weight: 300;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 4px;
+            color: var(--text-sub);
+            font-size: 14px;
+            min-width: 200px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            background: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-sub);
+            font-weight: 500;
+            white-space: nowrap;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .tab.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .forecast-container {
+            margin-bottom: 40px;
+            min-height: 120px;
+        }
+
+        .hourly-forecast {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 30px;
+        }
+
+        .hourly-item {
+            text-align: center;
+            flex: 1;
+        }
+
+        .hour {
+            font-size: 14px;
+            color: var(--text-sub);
+            margin-bottom: 12px;
+        }
+
+        .hourly-value {
+            font-size: 14px;
+            color: var(--text-main);
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+
+        .hourly-icon-box {
+            font-size: 24px;
+            color: #5f6368;
+            opacity: 0.8;
+        }
+
+        .daily-forecast {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            padding-top: 20px;
+        }
+
+        .daily-item {
+            text-align: center;
+            flex: 1;
+        }
+
+        .day-name {
+            font-weight: 500;
+            margin-bottom: 15px;
+            font-size: 15px;
+        }
+
+        .daily-icon {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: #3c4043;
+        }
+
+        .daily-temp {
+            font-size: 14px;
+            color: var(--text-main);
+        }
+
+        .daily-temp .min {
+            color: var(--text-sub);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Weather specific colors */
+        .fa-sun { color: #f9ab00; }
+        .fa-cloud-sun { color: #5f6368; }
+        .fa-cloud-showers-heavy { color: #1a73e8; }
+        .fa-droplet { color: #1a73e8; }
+        .wind-icon { display: inline-block; transform: scaleX(-1); }
+    </style>
+</head>
+<body>
+    <div class="container" th:if="${weather != null}">
+        <header>
+            <h1 th:text="${location}">Hà Nội, Vietnam</h1>
+            <div class="status" th:text="${currentTime}">Monday, 9:23 AM</div>
+        </header>
+
+        <section class="current-weather-section">
+            <div class="main-icon">
+                <i th:class="${weather.current.weather_code < 3 ? 'fa-solid fa-cloud-sun' : (weather.current.weather_code < 60 ? 'fa-solid fa-cloud' : 'fa-solid fa-cloud-showers-heavy')}"></i>
+            </div>
+            <div class="temp-display">
+                <span th:text="${#numbers.formatDecimal(weather.current.temperature_2m, 0, 0)}">78</span>
+                <span class="unit">°C</span>
+            </div>
+            <div class="details-grid">
+                <div>Precipitation: <span th:text="${weather.current.precipitation + '%'}">8%</span></div>
+                <div>Humidity: <span th:text="${weather.current.relative_humidity_2m + '%'}">60%</span></div>
+                <div>Wind: <span th:text="${#numbers.formatDecimal(weather.current.wind_speed_10m * 0.621371, 0, 0) + ' mph'}">9 mph</span></div>
+                <div>UV Index: 2</div>
+            </div>
+        </section>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="temp" onclick="switchToTab(this)"><i class="fa-solid fa-temperature-half"></i> Temperature</button>
+            <button class="tab" data-tab="precip" onclick="switchToTab(this)"><i class="fa-solid fa-cloud-rain"></i> Precipitation</button>
+            <button class="tab" data-tab="wind" onclick="switchToTab(this)"><i class="fa-solid fa-wind"></i> Wind</button>
+            <button class="tab" onclick="void(0)"><i class="fa-solid fa-wind"></i> Air Quality</button>
+            <button class="tab" onclick="void(0)"><i class="fa-solid fa-sun"></i> UV Index</button>
+            <button class="tab" onclick="void(0)"><i class="fa-solid fa-sun"></i> Sunset and Sunrise</button>
+        </div>
+
+        <div class="forecast-container">
+            <!-- Hourly Temperature Tab Content -->
+            <section id="tab-temp" class="hourly-forecast">
+                <div class="hourly-item" th:each="h : ${hourlyTemps}">
+                    <div class="hour" th:text="${h.hour}">3pm</div>
+                    <div class="hourly-value" th:text="${#numbers.formatDecimal(h.value, 0, 0) + h.unit}">78°</div>
+                    <div class="hourly-icon-box">
+                        <i class="fa-solid fa-sun" th:if="${h.value > 25}"></i>
+                        <i class="fa-solid fa-cloud-sun" th:if="${h.value <= 25}"></i>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Hourly Precipitation Tab Content -->
+            <section id="tab-precip" class="hourly-forecast hidden">
+                <div class="hourly-item" th:each="h : ${hourlyPrecip}">
+                    <div class="hour" th:text="${h.hour}">3pm</div>
+                    <div class="hourly-value" th:text="${#numbers.formatDecimal(h.value, 0, 0) + h.unit}">0%</div>
+                    <div class="hourly-icon-box"><i class="fa-solid fa-droplet"></i></div>
+                </div>
+            </section>
+
+            <!-- Hourly Wind Tab Content -->
+            <section id="tab-wind" class="hourly-forecast hidden">
+                <div class="hourly-item" th:each="h : ${hourlyWinds}">
+                    <div class="hour" th:text="${h.hour}">3pm</div>
+                    <div class="hourly-value" th:text="${#numbers.formatDecimal(h.value, 0, 0) + h.unit}">8 mph</div>
+                    <div class="hourly-icon-box"><i class="fa-solid fa-wind wind-icon"></i></div>
+                </div>
+            </section>
+        </div>
+
+        <section class="daily-forecast">
+            <div class="daily-item" th:each="d : ${dailyList}">
+                <div class="day-name" th:text="${d.day}">Today</div>
+                <div class="daily-icon">
+                    <i th:class="${d.code < 3 ? 'fa-solid fa-sun' : (d.code < 60 ? 'fa-solid fa-cloud-sun' : 'fa-solid fa-cloud-showers-heavy')}"></i>
+                </div>
+                <div class="daily-temp">
+                    <span th:text="${d.max + '°'}">74°</span> / <span class="min" th:text="${d.min + '°'}">69°</span>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        function switchToTab(el) {
+            const tabId = el.getAttribute('data-tab');
+            if (!tabId) return;
+
+            // Update active tab state
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+
+            // Toggle visibility of forecast sections
+            document.querySelectorAll('.hourly-forecast').forEach(section => {
+                if (section.id === 'tab-' + tabId) {
+                    section.classList.remove('hidden');
+                } else {
+                    section.classList.add('hidden');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
